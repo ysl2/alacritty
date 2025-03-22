@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use std::{env, fs, io};
 
-use log::{debug, error, info, warn};
+use log::{debug, error, info};
 use serde::Deserialize;
 use serde_yaml::Error as YamlError;
 use toml::de::Error as TomlError;
@@ -219,10 +219,6 @@ pub fn deserialize_config(path: &Path, warn_pruned: bool) -> Result<Value> {
     // Convert YAML to TOML as a transitionary fallback mechanism.
     let extension = path.extension().unwrap_or_default();
     if (extension == "yaml" || extension == "yml") && !contents.trim().is_empty() {
-        warn!(
-            "YAML config {path:?} is deprecated, please migrate to TOML using `alacritty migrate`"
-        );
-
         let mut value: serde_yaml::Value = serde_yaml::from_str(&contents)?;
         prune_yaml_nulls(&mut value, warn_pruned);
         contents = toml::to_string(&value)?;
